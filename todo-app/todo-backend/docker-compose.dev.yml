@@ -11,5 +11,5 @@ services:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./mongo_data:/data/db
 
-  volumes:
-    mongo_data:
+volumes:
+  mongo_data:
