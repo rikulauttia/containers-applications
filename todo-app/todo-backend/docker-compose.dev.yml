@@ -10,6 +10,8 @@ services:
     volumes:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./mongo_data:/data/db
+    networks:
+      - todo-backend-network
   redis:
     image: redis
     container_name: redis-server
@@ -17,7 +19,10 @@ services:
       - 6379:6379
     volumes:
       - ./redis_data:/data
-
+    networks:
+      - todo-backend-network
 volumes:
   mongo_data:
   redis_data:
+networks:
+  todo-backend-network:

@@ -15,8 +15,18 @@ router.post("/", async (req, res) => {
     text: req.body.text,
     done: false,
   });
-  const currentCount = (await getAsync("added_todos")) || 0;
-  await setAsync("added_todos", parseInt(currentCount) + 1);
+
+  console.log("✅ New todo added. Attempting to update Redis...");
+
+  const currentCount = parseInt(await getAsync("added_todos")) || 0;
+  console.log("🟡 Current count in Redis before update:", currentCount);
+
+  const newCount = currentCount + 1;
+  console.log("🟢 Storing new count in Redis:", newCount);
+
+  await setAsync("added_todos", newCount);
+  console.log("✅ Redis counter updated successfully!");
+
   res.send(todo);
 });
 
