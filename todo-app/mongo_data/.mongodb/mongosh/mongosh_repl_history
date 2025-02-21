@@ -1,0 +1,3 @@
+exit
+db.getUsers()
+db.createUser({ user: "the_username", pwd: "the_password", roles: [{ role: "readWrite", db: "the_database" }] })
