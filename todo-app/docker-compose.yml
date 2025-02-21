@@ -1,0 +1,68 @@
+services:
+  todo-frontend:
+    build:
+      context: ./todo-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=http://localhost:8080/api
+    container_name: todo-frontend-prod
+    networks:
+      - todo-app-network
+
+  todo-backend:
+    build:
+      context: ./todo-backend
+      dockerfile: Dockerfile
+    container_name: todo-backend-prod
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://root:example@mongo:27017/the_database?authSource=admin
+      - REDIS_URL=redis://redis-server:6379
+    networks:
+      - todo-app-network
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: the_database
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ./mongo_data:/data/db
+    networks:
+      - todo-app-network
+
+  redis:
+    image: redis
+    container_name: redis-server
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - todo-app-network
+
+  nginx:
+    image: nginx:1.20.1
+    container_name: reverse-proxy
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./todo-frontend/dist:/usr/share/nginx/html
+    depends_on:
+      - todo-frontend
+      - todo-backend
+    networks:
+      - todo-app-network
+
+volumes:
+  mongo_data:
+  redis_data:
+  todo-frontend-build:
+
+networks:
+  todo-app-network:
