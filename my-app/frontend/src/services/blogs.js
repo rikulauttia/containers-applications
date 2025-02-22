@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const baseUrl = import.meta.env.VITE_BACKEND_URL + "/blogs";
+const baseUrl = import.meta.env.VITE_BACKEND_URL
+  ? `${import.meta.env.VITE_BACKEND_URL}/blogs`
+  : "http://localhost:3003/api/blogs"; // Fallback
 
 let token = null;
 
