@@ -1,0 +1,50 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dev.Dockerfile
+    container_name: bloglist-frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 5173:5173
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3003/api
+    depends_on:
+      - backend
+    networks:
+      - bloglist-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dev.Dockerfile
+    container_name: bloglist-backend
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3003:3003
+    environment:
+      - MONGODB_URI=mongodb+srv://bloglist:ds76gj2jdrk@bloglist.h7vm4.mongodb.net/?retryWrites=true&w=majority&appName=bloglist
+      - PORT=3003
+      - SECRET=mysecret007
+    networks:
+      - bloglist-network
+
+  nginx:
+    image: nginx:1.20.1
+    container_name: reverse-proxy
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - bloglist-network
+
+networks:
+  bloglist-network:
